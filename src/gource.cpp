@@ -986,7 +986,7 @@ RFile* Gource::addFile(const RCommitFile& cf) {
 
     int tagid = tag_seq++;
 
-    RFile* file = new RFile(cf.filename, cf.colour, vec2(0.0,0.0), tagid);
+    RFile* file = new RFile(cf.filename, vec3(.3f), vec2(0.0,0.0), tagid);
 
     files[cf.filename] = file;
 

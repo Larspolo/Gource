@@ -201,7 +201,7 @@ void RFile::logic(float dt) {
     if(fade_start < 0.0f && gGourceSettings.file_idle_time > 0.0f && (elapsed - last_action) > gGourceSettings.file_idle_time) {
         fade_start = elapsed;
     }
-    
+
     // has completely faded out
     if(fade_start > 0.0f && !expired && (elapsed - fade_start) >= 1.0) {
 

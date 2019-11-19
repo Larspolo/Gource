@@ -122,5 +122,5 @@ ModifyAction::ModifyAction(RUser* source, RFile* target, time_t timestamp, float
 
 void ModifyAction::apply() {
     RAction::apply();
-    target->setFileColour(modify_colour);
+    target->setFileColour(vec3(.3f));
 }
