@@ -134,7 +134,7 @@ void RFile::setFilename(const std::string& abs_file_path) {
 }
 
 void RFile::colourize() {
-    file_colour = ext.size() ? colourHash(ext) : vec3(1.0f, 1.0f, 1.0f);
+    // file_colour = ext.size() ? colourHash(ext) : vec3(1.0f, 1.0f, 1.0f);
 }
 
 const vec3& RFile::getNameColour() const{

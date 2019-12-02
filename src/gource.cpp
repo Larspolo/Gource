@@ -1251,7 +1251,7 @@ void Gource::addFileAction(const RCommit& commit, const RCommitFile& cf, RFile* 
         if(cf.action == "A") {
             userAction = new CreateAction(user, file, commit.timestamp, t);
         } else {
-            userAction = new ModifyAction(user, file, commit.timestamp, t, cf.colour);
+            userAction = new ModifyAction(user, file, commit.timestamp, t, vec3(1.f,0.f,1.f));
         }
     }
 
