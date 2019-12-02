@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.rsc": "c",
+        "string": "cpp"
+    }
+}
