@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
     }
 #endif
 
-    SDLAppInit("Gource", "gource", exepath);
+    SDLAppInit("Clource", "gource", exepath);
 
 #ifdef _WIN32
         SDLApp::initConsole();
