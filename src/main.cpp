@@ -18,8 +18,8 @@
 #include "main.h"
 
 int main(int argc, char *argv[]) {
-
     std::string exepath;
+
 #ifndef _WIN32
     if(argc > 0) {
         exepath = std::string(argv[0]);

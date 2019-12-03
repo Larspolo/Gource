@@ -972,6 +972,13 @@ void Gource::deleteFile(RFile* file) {
 }
 
 
+long filesize2(std::string filename)
+{
+    struct stat stat_buf;
+    int rc = stat(filename.c_str(), &stat_buf);
+    return rc == 0 ? stat_buf.st_size : -1;
+}
+
 RFile* Gource::addFile(const RCommitFile& cf) {
 
     //if we already have max files in circulation
@@ -986,7 +993,9 @@ RFile* Gource::addFile(const RCommitFile& cf) {
 
     int tagid = tag_seq++;
 
-    RFile* file = new RFile(cf.filename, vec3(.3f), vec2(0.0,0.0), tagid);
+    long size = filesize2(gGourceSettings.path + cf.filename);
+    vec3 color = size == 0 ? vec3(.3f) : vec3((float)(size / 1000 + .2), .0f, .0f);
+    RFile* file = new RFile(cf.filename, color, vec2(0.0,0.0), tagid);
 
     files[cf.filename] = file;
 
@@ -1251,7 +1260,7 @@ void Gource::addFileAction(const RCommit& commit, const RCommitFile& cf, RFile* 
         if(cf.action == "A") {
             userAction = new CreateAction(user, file, commit.timestamp, t);
         } else {
-            userAction = new ModifyAction(user, file, commit.timestamp, t, cf.colour);
+            userAction = new ModifyAction(user, file, commit.timestamp, t, vec3(1.f,0.f,1.f));
         }
     }
 
@@ -2643,6 +2652,13 @@ void Gource::draw(float t, float dt) {
 
         textbox.setText(hoverFile->getName());
         if(display_path.size()) textbox.addLine(display_path);
+        
+        std::ifstream testFile(gGourceSettings.path + hoverFile->fullpath);    
+        std::string rline;
+        while(getline(testFile, rline)){
+            textbox.addLine(rline);
+        }
+        
         textbox.setColour(hoverFile->getColour());
 
         textbox.setPos(mousepos, true);
