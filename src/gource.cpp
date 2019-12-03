@@ -591,10 +591,10 @@ void Gource::selectFile(RFile* file) {
     if(file == 0) {
         return;
     }
-
+    std::system("vim");
     selectedFile = file;
 
-    //select user, lock on camera
+    //select file, lock on camera
     selectedFile->setSelected(true);
 }
 
