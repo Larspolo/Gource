@@ -591,7 +591,48 @@ void Gource::selectFile(RFile* file) {
     if(file == 0) {
         return;
     }
-    std::system("vim");
+    std::ifstream testFile(gGourceSettings.path + hoverFile->fullpath);
+    std::string rline;
+    int state = 0;
+    std::string command = "vim -O ";
+    int files = 0;
+    while(getline(testFile, rline)){
+        // Get length of duplicate code
+        if (state == 0) {
+            atoi(rline.c_str());
+            state = 1;
+        }
+        // Get files that duplicate code is in
+        else if (state == 1) {
+            // Go to next state if no more files
+            if (rline[0] == '=') {
+                state = 2;
+            } else {
+                // Add first 4 files to vim editor
+                if (files < 4) {
+                    command += rline + " +\"wincmd l\" ";
+                    files += 1;
+                }
+            }
+        }
+        // Loop over duplicate code
+        else if (state == 2) {
+            // End duplicate code, and go to next section
+            if (rline[0] == '=') {
+                state = 0;
+                // Run vim
+                command += "+\"" + std::to_string(files) + "wincmd h\"";
+                files = 0;
+                std::printf(command.c_str());
+                std::system(command.c_str());
+                command = "vim -O ";
+                break;
+            }
+        }
+        textbox.addLine(rline);
+    }
+    
+    
     selectedFile = file;
 
     //select file, lock on camera
@@ -2655,10 +2696,31 @@ void Gource::draw(float t, float dt) {
         
         std::ifstream testFile(gGourceSettings.path + hoverFile->fullpath);    
         std::string rline;
+        int state = 0;
+        int found = 0;
         while(getline(testFile, rline)){
-            textbox.addLine(rline);
+            // Get length of duplicate code
+            if (state == 0) {
+                found += atoi(rline.substr(0, rline.find(" ")).c_str());
+                
+                state = 1;
+            }
+            // Get files that duplicate code is in
+            else if (state == 1) {
+                // Go to next state if no more files
+                if (rline[0] == '=') {
+                    state = 2;
+                }
+            }
+            // Loop over duplicate code
+            else if (state == 2) {
+                // End duplicate code, and go to next section
+                if (rline[0] == '=') {
+                    state = 0;
+                }
+            }
         }
-        
+        textbox.addLine(std::to_string(found) + " duplicate lines found");
         textbox.setColour(hoverFile->getColour());
 
         textbox.setPos(mousepos, true);
