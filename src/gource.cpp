@@ -591,15 +591,16 @@ void Gource::selectFile(RFile* file) {
     if(file == 0) {
         return;
     }
+    
     std::ifstream testFile(gGourceSettings.path + hoverFile->fullpath);
     std::string rline;
     int state = 0;
     std::string command = "vim -O ";
     int files = 0;
+    std::string originalFile = "";
     while(getline(testFile, rline)){
         // Get length of duplicate code
         if (state == 0) {
-            atoi(rline.c_str());
             state = 1;
         }
         // Get files that duplicate code is in
@@ -610,6 +611,7 @@ void Gource::selectFile(RFile* file) {
             } else {
                 // Add first 4 files to vim editor
                 if (files < 4) {
+                    originalFile = rline;
                     command += rline + " +\"wincmd l\" ";
                     files += 1;
                 }
@@ -624,6 +626,15 @@ void Gource::selectFile(RFile* file) {
                 command += "+\"" + std::to_string(files) + "wincmd h\"";
                 files = 0;
                 std::printf(command.c_str());
+
+                // Get directory from file                
+                size_t found = originalFile.find_last_of("/\\");
+                std::string path = originalFile.substr(0,found);
+                
+                // Checkout target file
+                std::string gitCmd = "git -C \"" + path + "\" checkout " + currentCommit.targetHash;
+                printf("cmd: %s\n", gitCmd.c_str());
+                std::system(gitCmd.c_str());
                 std::system(command.c_str());
                 command = "vim -O ";
                 break;
@@ -1205,6 +1216,8 @@ void Gource::readLog() {
 }
 
 void Gource::processCommit(const RCommit& commit, float t) {
+
+    currentCommit = commit;
 
     //find files of this commit or create it
     for(std::list<RCommitFile>::const_iterator it = commit.files.begin(); it != commit.files.end(); it++) {

@@ -177,6 +177,7 @@ class Gource : public SDLApp {
 
     int commitqueue_max_size;
 
+    RCommit currentCommit;
     std::deque<RCommit> commitqueue;
     std::map<std::string, RUser*> users;
     std::map<std::string, RFile*> files;
