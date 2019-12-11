@@ -1409,7 +1409,7 @@ void Gource::updateUsers(float t, float dt) {
     for(std::map<std::string,RUser*>::iterator it = users.begin(); it!=users.end(); it++) {
         RUser* u = it->second;
 
-        u->logic(t, dt);
+        u->logic(t, dt, currentCommit);
 
         //deselect user if fading out from inactivity
         if(u->isFading() && selectedUser == u) {

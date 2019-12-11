@@ -20,6 +20,7 @@
 
 #include "user.h"
 #include "file.h"
+#include "formats/commitlog.h"
 
 class RUser;
 class RFile;
@@ -27,7 +28,7 @@ class RFile;
 class RAction {
 protected:
     vec3 colour;
-    virtual void apply();
+    virtual void apply(RCommit commit);
 public:
     RUser* source;
     RFile* target;
@@ -43,7 +44,7 @@ public:
     
     inline bool isFinished() const { return (progress >= 1.0); };
 
-    virtual void logic(float dt);
+    virtual void logic(float dt, RCommit commit);
 
     void drawToVBO(quadbuf& buffer) const ;
     void draw(float dt);
@@ -58,7 +59,7 @@ class RemoveAction : public RAction {
 public:
     RemoveAction(RUser* source, RFile* target, time_t timestamp, float t);
 
-    void logic(float dt);
+    void logic(float dt, RCommit commit);
 };
 
 class ModifyAction : public RAction {
@@ -67,7 +68,7 @@ protected:
 public:
     ModifyAction(RUser* source, RFile* target, time_t timestamp, float t, const vec3& modify_colour);
 
-    void apply();
+    void apply(RCommit commit);
 };
 
 #endif

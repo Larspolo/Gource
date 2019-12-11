@@ -21,15 +21,15 @@ RAction::RAction(RUser* source, RFile* target, time_t timestamp, float t, const 
     : colour(colour), source(source), target(target), timestamp(timestamp), t(t), progress(0.0f), rate(0.5f) {
 }
 
-void RAction::apply() {
+void RAction::apply(RCommit commit) {
     target->touch(timestamp, colour);
 }
 
-void RAction::logic(float dt) {
+void RAction::logic(float dt, RCommit currentCommit) {
     if(progress >= 1.0) return;
 
     if(progress == 0.0) {
-        apply();
+        apply(currentCommit);
     }
 
     float action_rate = std::min(10.0f, rate * std::max(1.0f, ((float)source->getPendingActionCount())));
@@ -106,10 +106,10 @@ RemoveAction::RemoveAction(RUser* source, RFile* target, time_t timestamp, float
     : RAction(source, target, timestamp, t, vec3(1.0f, 0.0f, 0.0f)) {
 }
 
-void RemoveAction::logic(float dt) {
+void RemoveAction::logic(float dt, RCommit currentCommit) {
     float old_progress = progress;
 
-    RAction::logic(dt);
+    RAction::logic(dt, currentCommit);
 
     if(old_progress < 1.0 && progress >= 1.0) {
         target->remove(timestamp);
@@ -120,17 +120,30 @@ ModifyAction::ModifyAction(RUser* source, RFile* target, time_t timestamp, float
     : RAction(source, target, timestamp, t, vec3(1.0f, 0.7f, 0.3f)), modify_colour(modify_colour) {
 }
 
-long filesize(std::string filename)
+// long filesize(std::string filename)
+// {
+//     struct stat stat_buf;
+//     int rc = stat(filename.c_str(), &stat_buf);
+//     return rc == 0 ? stat_buf.st_size : -1;
+// }
+
+long filesize(std::string dir, std::string file, RCommit commit)
 {
+    std::string gitCmd = "git -C \"" + dir + "\" show " + commit.hash + ":" + file.substr(1) + " > temp.txt";
+    printf("show: %s\n", gitCmd.c_str());
+    std::system(gitCmd.c_str());
+    
     struct stat stat_buf;
-    int rc = stat(filename.c_str(), &stat_buf);
+    int rc = stat("temp.txt", &stat_buf);
+    printf("Size: %ld\n", rc == 0 ? stat_buf.st_size : -1);
     return rc == 0 ? stat_buf.st_size : -1;
 }
 
-void ModifyAction::apply() {
-    RAction::apply();
+void ModifyAction::apply(RCommit commit) {
+    RAction::apply(commit);
 
-    long size = filesize(gGourceSettings.path + target->fullpath);
+    long size = filesize(gGourceSettings.path, target->fullpath, commit);
+    //long size = filesize(gGourceSettings.path + target->fullpath);
     vec3 color = size == 0 ? vec3(.3f) : vec3((float)(size / 1000 + .2), .0f, .0f);
 
     target->setFileColour(color);

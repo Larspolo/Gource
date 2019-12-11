@@ -230,7 +230,7 @@ int RUser::getPendingActionCount() {
     return actionCount;
 }
 
-void RUser::logic(float t, float dt) {
+void RUser::logic(float t, float dt, RCommit currentCommit) {
     Pawn::logic(dt);
 
     action_interval -= dt;
@@ -282,7 +282,7 @@ void RUser::logic(float t, float dt) {
 
         RAction* action = *it;
 
-        action->logic(dt);
+        action->logic(dt, currentCommit);
 
         if(action->isFinished()) {
             it = activeActions.erase(it);

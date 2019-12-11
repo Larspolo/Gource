@@ -23,6 +23,7 @@
 #include "pawn.h"
 #include "action.h"
 #include "file.h"
+#include "formats/commitlog.h"
 
 #include "sys/stat.h"
 
@@ -86,7 +87,7 @@ public:
 
     void calcScreenPos(GLint* viewport, GLdouble* modelview, GLdouble* projection);
 
-    void logic(float t, float dt);
+    void logic(float t, float dt, RCommit currentCommit);
 
     void updateActionsVBO(quadbuf& buffer);
 
