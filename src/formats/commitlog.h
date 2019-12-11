@@ -44,6 +44,7 @@ class RCommit {
 public:
     time_t timestamp;
     std::string username;
+    std::string hash;
     std::string targetHash;
 
     std::list<RCommitFile> files;

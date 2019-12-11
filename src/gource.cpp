@@ -635,6 +635,7 @@ void Gource::selectFile(RFile* file) {
                 std::string gitCmd = "git -C \"" + path + "\" checkout " + currentCommit.targetHash;
                 printf("cmd: %s\n", gitCmd.c_str());
                 std::system(gitCmd.c_str());
+                std::system(("gnome-terminal -x less " + gGourceSettings.path + hoverFile->fullpath).c_str());
                 std::system(command.c_str());
                 command = "vim -O ";
                 break;
@@ -1024,10 +1025,15 @@ void Gource::deleteFile(RFile* file) {
 }
 
 
-long filesize2(std::string filename)
+long filesize2(std::string dir, std::string file, RCommit commit)
 {
+    std::string gitCmd = "git -C \"" + dir + "\" show " + commit.hash + ":" + file.substr(1) + " > temp.txt";
+    printf("show: %s\n", gitCmd.c_str());
+    std::system(gitCmd.c_str());
+    
     struct stat stat_buf;
-    int rc = stat(filename.c_str(), &stat_buf);
+    int rc = stat("temp.txt", &stat_buf);
+    printf("Size: %ld\n", rc == 0 ? stat_buf.st_size : -1);
     return rc == 0 ? stat_buf.st_size : -1;
 }
 
@@ -1045,7 +1051,7 @@ RFile* Gource::addFile(const RCommitFile& cf) {
 
     int tagid = tag_seq++;
 
-    long size = filesize2(gGourceSettings.path + cf.filename);
+    long size = filesize2(gGourceSettings.path, cf.filename, currentCommit);
     vec3 color = size == 0 ? vec3(.3f) : vec3((float)(size / 1000 + .2), .0f, .0f);
     RFile* file = new RFile(cf.filename, color, vec2(0.0,0.0), tagid);
 

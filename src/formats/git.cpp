@@ -85,7 +85,7 @@ void GitCommitLog::readGitVersion() {
 std::string GitCommitLog::logCommand() {
 
     std::string log_command = "git log "
-    "--pretty=format:user:%aN%n%ct%n%s "
+    "--pretty=format:user:%aN%n%at%n%H%n%s "
     "--reverse --raw --encoding=UTF-8 "
     "--no-renames";
 
@@ -228,8 +228,15 @@ bool GitCommitLog::parseCommit(RCommit& commit) {
             if(!logf->getNextLine(line)) return false;
 
             // Grab commit hash (of the original) from the commit message
+            commit.hash = line;
+            printf("commit: %s\n", commit.hash.c_str());
+
+
+            if(!logf->getNextLine(line)) return false;
+
+            // Grab commit hash (of the original) from the commit message
             commit.targetHash = line;
-            printf("commit: %s\n", commit.targetHash.c_str());
+            printf("target commit: %s\n", commit.targetHash.c_str());
 
             continue;
         }
