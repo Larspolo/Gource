@@ -592,7 +592,11 @@ void Gource::selectFile(RFile* file) {
         return;
     }
     
-    std::ifstream testFile(gGourceSettings.path + hoverFile->fullpath);
+    std::string gitCmd = "git -C \"" + gGourceSettings.path + "\" show " + currentCommit.hash + ":" + hoverFile->fullpath.substr(1) + " > temp2.txt";
+    //printf("show: %s\n", gitCmd.c_str());
+    std::system(gitCmd.c_str());
+
+    std::ifstream testFile("temp2.txt");
     std::string rline;
     int state = 0;
     std::string command = "vim -O ";
@@ -2713,7 +2717,11 @@ void Gource::draw(float t, float dt) {
         textbox.setText(hoverFile->getName());
         if(display_path.size()) textbox.addLine(display_path);
         
-        std::ifstream testFile(gGourceSettings.path + hoverFile->fullpath);    
+        std::string gitCmd = "git -C \"" + gGourceSettings.path + "\" show " + currentCommit.hash + ":" + hoverFile->fullpath.substr(1) + " > temp2.txt";
+        //printf("show: %s\n", gitCmd.c_str());
+        std::system(gitCmd.c_str());
+                
+        std::ifstream testFile("temp2.txt");    
         std::string rline;
         int state = 0;
         int found = 0;
