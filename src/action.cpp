@@ -17,6 +17,63 @@
 
 #include "action.h"
 
+int getLen(RCommit commit, RFile* file) {
+    std::string gitCmd = "git -C \"" + gGourceSettings.path + "\" show " + commit.hash + ":" + file->fullpath.substr(1) + " > temp2.txt";
+
+    std::system(gitCmd.c_str());
+
+    std::ifstream testFile("temp2.txt");
+    std::string rline;
+    int state = 0;
+    int found = 0;
+    while(getline(testFile, rline)){
+        // Get length of duplicate code
+        if (state == 0) {
+            found += atoi(rline.substr(0, rline.find(" ")).c_str());
+
+            state = 1;
+        }
+        // Get files that duplicate code is in
+        else if (state == 1) {
+            // Go to next state if no more files
+            if (rline[0] == '=') {
+                state = 2;
+            }
+        }
+        // Loop over duplicate code
+        else if (state == 2) {
+            // End duplicate code, and go to next section
+            if (rline[0] == '=') {
+                state = 0;
+            }
+        }
+    }
+
+    return found;
+}
+
+int lenFromColor(vec3 color) {
+    if (color[0] == 1.0f)
+        return 100;
+    if (color[2] == .2f)
+        return 0;
+    if (color[0] != .0f)
+        return (color[0] - .2) / .8 * 100.0;
+    else
+        return -((color[1] - .2) / .8 * 100.0);
+}
+
+vec3 colorFromLen(int len) {
+    if (len > 100)
+        return vec3(1.0f, .0f, .0f);
+    if (len == 0)
+        return vec3(.2f);
+    if (len > 0)
+        return vec3((float)(len / 100.0 *.8 + .2), .0f, .0f);
+    else
+        return vec3(.0f, (float)(len / 100.0 *.8 + .2), .0f);
+}
+
 RAction::RAction(RUser* source, RFile* target, time_t timestamp, float t, const vec3& colour)
     : colour(colour), source(source), target(target), timestamp(timestamp), t(t), progress(0.0f), rate(0.5f) {
 }
@@ -99,11 +156,11 @@ void RAction::draw(float dt) {
 }
 
 CreateAction::CreateAction(RUser* source, RFile* target, time_t timestamp, float t)
-    : RAction(source, target, timestamp, t, vec3(0.0f, 1.0f, 0.0f)) {
+    : RAction(source, target, timestamp, t, target->getColour()) {
 }
 
 RemoveAction::RemoveAction(RUser* source, RFile* target, time_t timestamp, float t)
-    : RAction(source, target, timestamp, t, vec3(1.0f, 0.0f, 0.0f)) {
+    : RAction(source, target, timestamp, t, target->getColour()) {
 }
 
 void RemoveAction::logic(float dt, RCommit currentCommit) {
@@ -117,34 +174,14 @@ void RemoveAction::logic(float dt, RCommit currentCommit) {
 }
 
 ModifyAction::ModifyAction(RUser* source, RFile* target, time_t timestamp, float t, const vec3& modify_colour)
-    : RAction(source, target, timestamp, t, vec3(1.0f, 0.7f, 0.3f)), modify_colour(modify_colour) {
-}
-
-// long filesize(std::string filename)
-// {
-//     struct stat stat_buf;
-//     int rc = stat(filename.c_str(), &stat_buf);
-//     return rc == 0 ? stat_buf.st_size : -1;
-// }
-
-long filesize(std::string dir, std::string file, RCommit commit)
-{
-    std::string gitCmd = "git -C \"" + dir + "\" show " + commit.hash + ":" + file.substr(1) + " > temp.txt";
-    printf("show: %s\n", gitCmd.c_str());
-    std::system(gitCmd.c_str());
-    
-    struct stat stat_buf;
-    int rc = stat("temp.txt", &stat_buf);
-    printf("Size: %ld\n", rc == 0 ? stat_buf.st_size : -1);
-    return rc == 0 ? stat_buf.st_size : -1;
+    : RAction(source, target, timestamp, t, target->getColour()), modify_colour(modify_colour) {
 }
 
 void ModifyAction::apply(RCommit commit) {
     RAction::apply(commit);
 
-    long size = filesize(gGourceSettings.path, target->fullpath, commit);
-    //long size = filesize(gGourceSettings.path + target->fullpath);
-    vec3 color = size == 0 ? vec3(.3f) : vec3((float)(size / 1000 + .2), .0f, .0f);
+    int len = getLen(commit, target);
+    vec3 color = colorFromLen(len);
 
     target->setFileColour(color);
 }

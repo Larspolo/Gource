@@ -127,7 +127,7 @@ void RFile::setFilename(const std::string& abs_file_path) {
     size_t dotsep = name.rfind(".");
 
     if(dotsep != std::string::npos && dotsep != name.size()-1) {
-        ext = name.substr(dotsep+1);
+        ext = name.substr(dotsep);
     } else if(gGourceSettings.file_extension_fallback) {
         ext = name;
     }
@@ -165,9 +165,9 @@ float RFile::getAlpha() const{
     float alpha = Pawn::getAlpha();
 
     //user fades out if not doing anything
-    if(fade_start > 0.0f) {
-        alpha = 1.0 - glm::clamp(elapsed - fade_start, 0.0f, 1.0f);
-    }
+    // if(fade_start > 0.0f) {
+    //     alpha = 1.0 - glm::clamp(elapsed - fade_start, 0.0f, 1.0f);
+    // }
 
     return alpha;
 }

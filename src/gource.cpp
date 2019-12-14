@@ -591,7 +591,7 @@ void Gource::selectFile(RFile* file) {
     if(file == 0) {
         return;
     }
-    
+
     std::string gitCmd = "git -C \"" + gGourceSettings.path + "\" show " + currentCommit.hash + ":" + hoverFile->fullpath.substr(1) + " > temp2.txt";
     //printf("show: %s\n", gitCmd.c_str());
     std::system(gitCmd.c_str());
@@ -631,10 +631,10 @@ void Gource::selectFile(RFile* file) {
                 files = 0;
                 std::printf(command.c_str());
 
-                // Get directory from file                
+                // Get directory from file
                 size_t found = originalFile.find_last_of("/\\");
                 std::string path = originalFile.substr(0,found);
-                
+
                 // Checkout target file
                 std::string gitCmd = "git -C \"" + path + "\" checkout " + currentCommit.targetHash;
                 printf("cmd: %s\n", gitCmd.c_str());
@@ -647,8 +647,8 @@ void Gource::selectFile(RFile* file) {
         }
         textbox.addLine(rline);
     }
-    
-    
+
+
     selectedFile = file;
 
     //select file, lock on camera
@@ -1028,19 +1028,6 @@ void Gource::deleteFile(RFile* file) {
     delete file;
 }
 
-
-long filesize2(std::string dir, std::string file, RCommit commit)
-{
-    std::string gitCmd = "git -C \"" + dir + "\" show " + commit.hash + ":" + file.substr(1) + " > temp.txt";
-    printf("show: %s\n", gitCmd.c_str());
-    std::system(gitCmd.c_str());
-    
-    struct stat stat_buf;
-    int rc = stat("temp.txt", &stat_buf);
-    printf("Size: %ld\n", rc == 0 ? stat_buf.st_size : -1);
-    return rc == 0 ? stat_buf.st_size : -1;
-}
-
 RFile* Gource::addFile(const RCommitFile& cf) {
 
     //if we already have max files in circulation
@@ -1055,8 +1042,43 @@ RFile* Gource::addFile(const RCommitFile& cf) {
 
     int tagid = tag_seq++;
 
-    long size = filesize2(gGourceSettings.path, cf.filename, currentCommit);
-    vec3 color = size == 0 ? vec3(.3f) : vec3((float)(size / 1000 + .2), .0f, .0f);
+    std::string gitCmd = "git -C \"" + gGourceSettings.path + "\" show " + currentCommit.hash + ":" + cf.filename.substr(1) + " > temp2.txt";
+
+    std::system(gitCmd.c_str());
+
+    std::ifstream testFile("temp2.txt");
+    std::string rline;
+    int state = 0;
+    int found = 0;
+    while(getline(testFile, rline)){
+        // Get length of duplicate code
+        if (state == 0) {
+            found += atoi(rline.substr(0, rline.find(" ")).c_str());
+
+            state = 1;
+        }
+        // Get files that duplicate code is in
+        else if (state == 1) {
+            // Go to next state if no more files
+            if (rline[0] == '=') {
+                state = 2;
+            }
+        }
+        // Loop over duplicate code
+        else if (state == 2) {
+            // End duplicate code, and go to next section
+            if (rline[0] == '=') {
+                state = 0;
+            }
+        }
+    }
+    if (found > 100)
+        found = 100;
+    if (found > 0) {
+        printf("show: %s:::", gitCmd.c_str());
+        printf("colour: %d %f\n", found, (float)(found / 100.0 *.8 + .2));
+    }
+    vec3 color = found == 0 ? vec3(.3f) : vec3((float)(found / 100.0 *.8 + .2), .0f, .0f);
     RFile* file = new RFile(cf.filename, color, vec2(0.0,0.0), tagid);
 
     files[cf.filename] = file;
@@ -2716,12 +2738,12 @@ void Gource::draw(float t, float dt) {
 
         textbox.setText(hoverFile->getName());
         if(display_path.size()) textbox.addLine(display_path);
-        
+
         std::string gitCmd = "git -C \"" + gGourceSettings.path + "\" show " + currentCommit.hash + ":" + hoverFile->fullpath.substr(1) + " > temp2.txt";
         //printf("show: %s\n", gitCmd.c_str());
         std::system(gitCmd.c_str());
-                
-        std::ifstream testFile("temp2.txt");    
+
+        std::ifstream testFile("temp2.txt");
         std::string rline;
         int state = 0;
         int found = 0;
@@ -2729,7 +2751,7 @@ void Gource::draw(float t, float dt) {
             // Get length of duplicate code
             if (state == 0) {
                 found += atoi(rline.substr(0, rline.find(" ")).c_str());
-                
+
                 state = 1;
             }
             // Get files that duplicate code is in

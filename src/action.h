@@ -41,7 +41,7 @@ public:
 
     RAction(RUser* source, RFile* target, time_t timestamp, float t, const vec3& colour);
     virtual ~RAction() {};
-    
+
     inline bool isFinished() const { return (progress >= 1.0); };
 
     virtual void logic(float dt, RCommit commit);
@@ -72,4 +72,3 @@ public:
 };
 
 #endif
-
