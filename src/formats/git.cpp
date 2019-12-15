@@ -239,7 +239,7 @@ bool GitCommitLog::parseCommit(RCommit& commit) {
             if(!logf->getNextLine(line)) return false;
             if(!logf->getNextLine(line)) return false;
             if(!logf->getNextLine(line)) return false;
-            
+
             commit.type1dups = line;
             printf("type1 dups: %s\n", commit.type1dups.c_str());
 
@@ -260,7 +260,7 @@ bool GitCommitLog::parseCommit(RCommit& commit) {
             printf("type1 biggestclass: %s\n", commit.type1biggestClass.c_str());
 
             if(!logf->getNextLine(line)) return false;
-            if(!logf->getNextLine(line)) return false; 
+            if(!logf->getNextLine(line)) return false;
             if(!logf->getNextLine(line)) return false;
             commit.type2dups = line;
             printf("type2 dups: %s\n", commit.type2dups.c_str());
@@ -281,11 +281,13 @@ bool GitCommitLog::parseCommit(RCommit& commit) {
             commit.type2biggestClass = line;
             printf("type2 number: %s\n", commit.type2biggestClass.c_str());
 
-            if(!logf->getNextLine(line)) return false; 
+            if(!logf->getNextLine(line)) return false;
             if(!logf->getNextLine(line)) return false;
             while(logf->getNextLine(line) && line.size() && line != "::::end::::") {
                 commit.message += line + "\n";
             }
+            logf->getNextLine(line);
+            logf->getNextLine(line);
 
             printf("message: %s\n", commit.message.c_str());
 

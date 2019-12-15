@@ -2809,14 +2809,14 @@ void Gource::draw(float t, float dt) {
         font.print(1,240, currentCommit.type1biggest.c_str());
         font.print(1,260, currentCommit.type1number.c_str());
         font.print(1,280, currentCommit.type1biggestClass.c_str());
-        
+
         font.print(1,320,"Type 2:");
         font.print(1,340, currentCommit.type2dups.c_str());
         font.print(1,360, currentCommit.type2clones.c_str());
         font.print(1,380, currentCommit.type2biggest.c_str());
         font.print(1,400, currentCommit.type2number.c_str());
         font.print(1,420, currentCommit.type2biggestClass.c_str());
-        
+
         font.print(1,460, "Message:");
         // font.print(1,480, currentCommit.message.c_str());
         int y = 480;
