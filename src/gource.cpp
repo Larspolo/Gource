@@ -17,6 +17,8 @@
 
 #include "gource.h"
 #include "core/png_writer.h"
+#include <sstream>
+
 
 bool  gGourceDrawBackground  = true;
 bool  gGourceQuadTreeDebug   = false;
@@ -2800,47 +2802,73 @@ void Gource::draw(float t, float dt) {
         font.print(1,100,"Files: %d", files.size());
         font.print(1,120,"Dirs: %d",  gGourceDirMap.size());
 
-        font.print(1,140,"Log Position: %.4f", commitlog->getPercent());
-        font.print(1,160,"Camera: (%.2f, %.2f, %.2f)", campos.x, campos.y, campos.z);
-        font.print(1,180,"Gravity: %.2f", gGourceForceGravity);
-        font.print(1,200,"Update Tree: %u ms", update_dir_tree_time);
-        font.print(1,220,"Update VBOs: %u ms", update_vbos_time);
-        font.print(1,240,"Projection: %u ms",  screen_project_time);
-
-        font.print(1,260,"Draw Scene: %u ms",  draw_scene_time);
-        font.print(1,280," - Edges: %u ms",   draw_edges_time);
-        font.print(1,300," - Shadows: %u ms", draw_shadows_time);
-        font.print(1,320," - Actions: %u ms", draw_actions_time);
-        font.print(1,340," - Files: %u ms",   draw_files_time);
-        font.print(1,360," - Users: %u ms",   draw_users_time);
-        font.print(1,380," - Bloom: %u ms",   draw_bloom_time);
-        font.print(1,400,"Text: %u ms",       text_time);
-        font.print(1,420,"- Update: %u ms",   text_update_time);
-        font.print(1,440,"- VBO Commit: %u ms", text_vbo_commit_time);
-        font.print(1,460,"- VBO Draw: %u ms",   text_vbo_draw_time);
-        font.print(1,480,"Mouse Trace: %u ms", trace_time);
-        font.print(1,500,"Logic Time: %u ms", logic_time);
-        font.print(1,520,"File Inner Loops: %d", gGourceFileInnerLoops);
-        font.print(1,540,"User Inner Loops: %d", gGourceUserInnerLoops);
-
-        font.print(1,560,"Dir Inner Loops: %d (QTree items = %d, nodes = %d, max node depth = %d)", gGourceDirNodeInnerLoops,
-            dirNodeTree->item_count, dirNodeTree->node_count, dirNodeTree->max_node_depth);
-
-        font.print(1,580,"Dir Bounds Ratio: %.2f, %.5f", dir_bounds.width() / dir_bounds.height(), rotation_remaining_angle);
-        font.print(1,600,"String Hash Seed: %d", gStringHashSeed);
-
-        if(!gGourceSettings.ffp) {
-            font.print(1,620,"Text VBO: %d/%d vertices, %d texture changes", fontmanager.font_vbo.vertices(), fontmanager.font_vbo.capacity(), fontmanager.font_vbo.texture_changes());
-            font.print(1,640,"File VBO: %d/%d vertices, %d texture changes", file_vbo.vertices(), file_vbo.capacity(), file_vbo.texture_changes());
-            font.print(1,660,"User VBO: %d/%d vertices, %d texture changes", user_vbo.vertices(), user_vbo.capacity(), user_vbo.texture_changes());
-            font.print(1,680,"Action VBO: %d/%d vertices", action_vbo.vertices(), action_vbo.capacity());
-            font.print(1,700,"Bloom VBO: %d/%d vertices", bloom_vbo.vertices(), bloom_vbo.capacity());
-            font.print(1,720,"Edge VBO: %d/%d vertices",  edge_vbo.vertices(), edge_vbo.capacity());
+        font.print(1,160,"==== Clones ====");
+        font.print(1,180,"Type 1:");
+        font.print(1,200, currentCommit.type1dups.c_str());
+        font.print(1,220, currentCommit.type1clones.c_str());
+        font.print(1,240, currentCommit.type1biggest.c_str());
+        font.print(1,260, currentCommit.type1number.c_str());
+        font.print(1,280, currentCommit.type1biggestClass.c_str());
+        
+        font.print(1,320,"Type 2:");
+        font.print(1,340, currentCommit.type2dups.c_str());
+        font.print(1,360, currentCommit.type2clones.c_str());
+        font.print(1,380, currentCommit.type2biggest.c_str());
+        font.print(1,400, currentCommit.type2number.c_str());
+        font.print(1,420, currentCommit.type2biggestClass.c_str());
+        
+        font.print(1,460, "Message:");
+        // font.print(1,480, currentCommit.message.c_str());
+        int y = 480;
+        std::istringstream iss(currentCommit.message);
+        std::string item;
+        while(std::getline(iss, item, '\n'))
+        {
+            font.print(1, y, item.c_str());
+            y += 20;
         }
 
-        if(selectedUser != 0) {
+        // font.print(1,140,"Log Position: %.4f", commitlog->getPercent());
+        // font.print(1,160,"Camera: (%.2f, %.2f, %.2f)", campos.x, campos.y, campos.z);
+        // font.print(1,180,"Gravity: %.2f", gGourceForceGravity);
+        // font.print(1,200,"Update Tree: %u ms", update_dir_tree_time);
+        // font.print(1,220,"Update VBOs: %u ms", update_vbos_time);
+        // font.print(1,240,"Projection: %u ms",  screen_project_time);
 
-        }
+        // font.print(1,260,"Draw Scene: %u ms",  draw_scene_time);
+        // font.print(1,280," - Edges: %u ms",   draw_edges_time);
+        // font.print(1,300," - Shadows: %u ms", draw_shadows_time);
+        // font.print(1,320," - Actions: %u ms", draw_actions_time);
+        // font.print(1,340," - Files: %u ms",   draw_files_time);
+        // font.print(1,360," - Users: %u ms",   draw_users_time);
+        // font.print(1,380," - Bloom: %u ms",   draw_bloom_time);
+        // font.print(1,400,"Text: %u ms",       text_time);
+        // font.print(1,420,"- Update: %u ms",   text_update_time);
+        // font.print(1,440,"- VBO Commit: %u ms", text_vbo_commit_time);
+        // font.print(1,460,"- VBO Draw: %u ms",   text_vbo_draw_time);
+        // font.print(1,480,"Mouse Trace: %u ms", trace_time);
+        // font.print(1,500,"Logic Time: %u ms", logic_time);
+        // font.print(1,520,"File Inner Loops: %d", gGourceFileInnerLoops);
+        // font.print(1,540,"User Inner Loops: %d", gGourceUserInnerLoops);
+
+        // font.print(1,560,"Dir Inner Loops: %d (QTree items = %d, nodes = %d, max node depth = %d)", gGourceDirNodeInnerLoops,
+        //     dirNodeTree->item_count, dirNodeTree->node_count, dirNodeTree->max_node_depth);
+
+        // font.print(1,580,"Dir Bounds Ratio: %.2f, %.5f", dir_bounds.width() / dir_bounds.height(), rotation_remaining_angle);
+        // font.print(1,600,"String Hash Seed: %d", gStringHashSeed);
+
+        // if(!gGourceSettings.ffp) {
+        //     font.print(1,620,"Text VBO: %d/%d vertices, %d texture changes", fontmanager.font_vbo.vertices(), fontmanager.font_vbo.capacity(), fontmanager.font_vbo.texture_changes());
+        //     font.print(1,640,"File VBO: %d/%d vertices, %d texture changes", file_vbo.vertices(), file_vbo.capacity(), file_vbo.texture_changes());
+        //     font.print(1,660,"User VBO: %d/%d vertices, %d texture changes", user_vbo.vertices(), user_vbo.capacity(), user_vbo.texture_changes());
+        //     font.print(1,680,"Action VBO: %d/%d vertices", action_vbo.vertices(), action_vbo.capacity());
+        //     font.print(1,700,"Bloom VBO: %d/%d vertices", bloom_vbo.vertices(), bloom_vbo.capacity());
+        //     font.print(1,720,"Edge VBO: %d/%d vertices",  edge_vbo.vertices(), edge_vbo.capacity());
+        // }
+
+        // if(selectedUser != 0) {
+
+        // }
 
         if(selectedFile != 0) {
             font.print(1,740,"%s: %d files (%d visible)", selectedFile->getDir()->getPath().c_str(),

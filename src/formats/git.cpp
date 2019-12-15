@@ -85,7 +85,7 @@ void GitCommitLog::readGitVersion() {
 std::string GitCommitLog::logCommand() {
 
     std::string log_command = "git log "
-    "--pretty=format:user:%aN%n%at%n%H%n%s "
+    "--pretty=format:user:%aN%n%at%n%H%n%B%n::::end:::: "
     "--reverse --raw --encoding=UTF-8 "
     "--no-renames";
 
@@ -225,18 +225,69 @@ bool GitCommitLog::parseCommit(RCommit& commit) {
             //this isnt a commit we are parsing, abort
             if(commit.timestamp == 0) return false;
 
-            if(!logf->getNextLine(line)) return false;
 
             // Grab commit hash (of the original) from the commit message
+            if(!logf->getNextLine(line)) return false;
             commit.hash = line;
             printf("commit: %s\n", commit.hash.c_str());
 
-
+            // Grab commit hash (of the target) from the commit message
             if(!logf->getNextLine(line)) return false;
-
-            // Grab commit hash (of the original) from the commit message
             commit.targetHash = line;
             printf("target commit: %s\n", commit.targetHash.c_str());
+
+            if(!logf->getNextLine(line)) return false;
+            if(!logf->getNextLine(line)) return false;
+            if(!logf->getNextLine(line)) return false;
+            
+            commit.type1dups = line;
+            printf("type1 dups: %s\n", commit.type1dups.c_str());
+
+            if(!logf->getNextLine(line)) return false;
+            commit.type1clones = line;
+            printf("type1 clones: %s\n", commit.type1clones.c_str());
+
+            if(!logf->getNextLine(line)) return false;
+            commit.type1biggest = line;
+            printf("type1 biggest: %s\n", commit.type1biggest.c_str());
+
+            if(!logf->getNextLine(line)) return false;
+            commit.type1number = line;
+            printf("type1 number: %s\n", commit.type1number.c_str());
+
+            if(!logf->getNextLine(line)) return false;
+            commit.type1biggestClass = line;
+            printf("type1 biggestclass: %s\n", commit.type1biggestClass.c_str());
+
+            if(!logf->getNextLine(line)) return false;
+            if(!logf->getNextLine(line)) return false; 
+            if(!logf->getNextLine(line)) return false;
+            commit.type2dups = line;
+            printf("type2 dups: %s\n", commit.type2dups.c_str());
+
+            if(!logf->getNextLine(line)) return false;
+            commit.type2clones = line;
+            printf("type2 clones: %s\n", commit.type2clones.c_str());
+
+            if(!logf->getNextLine(line)) return false;
+            commit.type2biggest = line;
+            printf("type2 biggest: %s\n", commit.type2biggest.c_str());
+
+            if(!logf->getNextLine(line)) return false;
+            commit.type2number = line;
+            printf("type2 number: %s\n", commit.type2number.c_str());
+
+            if(!logf->getNextLine(line)) return false;
+            commit.type2biggestClass = line;
+            printf("type2 number: %s\n", commit.type2biggestClass.c_str());
+
+            if(!logf->getNextLine(line)) return false; 
+            if(!logf->getNextLine(line)) return false;
+            while(logf->getNextLine(line) && line.size() && line != "::::end::::") {
+                commit.message += line + "\n";
+            }
+
+            printf("message: %s\n", commit.message.c_str());
 
             continue;
         }

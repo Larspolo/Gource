@@ -46,6 +46,17 @@ public:
     std::string username;
     std::string hash;
     std::string targetHash;
+    std::string type1dups;
+    std::string type2dups;
+    std::string type1clones;
+    std::string type2clones;
+    std::string type1biggest;
+    std::string type2biggest;
+    std::string type1number;
+    std::string type2number;
+    std::string type1biggestClass;
+    std::string type2biggestClass;
+    std::string message;
 
     std::list<RCommitFile> files;
 
