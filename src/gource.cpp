@@ -2607,29 +2607,29 @@ void Gource::draw(float t, float dt) {
     text_time = SDL_GetTicks() - text_time;
 
     if(debug) {
-        glDisable(GL_TEXTURE_2D);
-        glLineWidth(2.0);
-        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        // glDisable(GL_TEXTURE_2D);
+        // glLineWidth(2.0);
+        // glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 
-        track_users ? active_user_bounds.draw() : dir_bounds.draw();
+        // track_users ? active_user_bounds.draw() : dir_bounds.draw();
     }
 
     if(gGourceQuadTreeDebug) {
-        glDisable(GL_TEXTURE_2D);
-
-        glLineWidth(1.0);
-
-        glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
-
-        dirNodeTree->outline();
-
-        glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
-
-        userTree->outline();
-
-        glColor4f(0.0f, 1.0f, 0.5f, 1.0f);
-
-        userTree->outlineItems();
+        // glDisable(GL_TEXTURE_2D);
+        //
+        // glLineWidth(1.0);
+        //
+        // glColor4f(0.0f, 1.0f, 0.0f, 1.0f);
+        //
+        // dirNodeTree->outline();
+        //
+        // glColor4f(0.0f, 1.0f, 1.0f, 1.0f);
+        //
+        // userTree->outline();
+        //
+        // glColor4f(0.0f, 1.0f, 0.5f, 1.0f);
+        //
+        // userTree->outlineItems();
     }
 
     glColor4f(1.0f, 1.0f, 1.0f, 1.0f);

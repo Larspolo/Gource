@@ -127,10 +127,11 @@ void RFile::setFilename(const std::string& abs_file_path) {
     size_t dotsep = name.rfind(".");
 
     if(dotsep != std::string::npos && dotsep != name.size()-1) {
-        ext = name.substr(dotsep);
+        ext = "";
     } else if(gGourceSettings.file_extension_fallback) {
-        ext = name;
+        ext = "";
     }
+    ext = "";
 }
 
 void RFile::colourize() {
@@ -286,8 +287,8 @@ void RFile::drawNameText(float alpha) {
     if(selected) {
         file_selected_font.draw(screenpos.x, screenpos.y, name);
     } else {
-        file_font.setAlpha(name_alpha);
-        file_font.draw(screenpos.x, screenpos.y, gGourceSettings.file_extensions ? ext : name);
+        // file_font.setAlpha(name_alpha);
+        // file_font.draw(screenpos.x, screenpos.y, gGourceSettings.file_extensions ? ext : name);
     }
 }
 
